@@ -14,6 +14,10 @@ import androidx.core.app.ShareCompat
 import androidx.compose.material.icons.filled.Share
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.Settings
+import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.foundation.text.KeyboardOptions
+import com.example.cattasticpos.domain.model.AppConfig
 import androidx.compose.material.icons.filled.ExpandLess
 import androidx.compose.material.icons.filled.ExpandMore
 import androidx.compose.material.icons.filled.ReceiptLong
@@ -50,6 +54,7 @@ fun HistoryScreen(
     val expensesList by viewModel.expensesListState.collectAsState()
     val totalExpenses by viewModel.totalExpensesState.collectAsState()
     val exportMessage by viewModel.exportMessage.collectAsState()
+    val appConfig by viewModel.appConfigState.collectAsState()
     val snackbarHostState = remember { SnackbarHostState() }
     
     LaunchedEffect(exportMessage) {
@@ -93,6 +98,7 @@ fun HistoryScreen(
         ) {
             val context = LocalContext.current
             var isZReadingExpanded by remember { mutableStateOf(false) }
+            var showConfigDialog by remember { mutableStateOf(false) }
 
             val todayStart = remember {
                 Calendar.getInstance().apply {
@@ -112,13 +118,14 @@ fun HistoryScreen(
                 orders.size
             }
 
-            val startingFloat = 500.0
+            val startingFloat = appConfig?.startingCashFloat ?: 500.0
+            val targetSales = appConfig?.targetSales ?: 5000.0
             val totalCash = cashSales ?: 0.0
             val totalGcash = gcashSales ?: 0.0
             val totalSales = grossSales ?: 0.0
             val expenses = totalExpenses ?: 0.0
             val profits = totalSales - expenses
-            val cashDrawer = startingFloat + totalCash - expenses
+            val cashDrawer = startingFloat + totalSales
 
             Card(
                 colors = CardDefaults.cardColors(
@@ -166,6 +173,10 @@ fun HistoryScreen(
                             Text("Export", fontSize = 12.sp)
                         }
                         
+                        IconButton(onClick = { showConfigDialog = true }, modifier = Modifier.size(32.dp)) {
+                            Icon(imageVector = Icons.Default.Settings, contentDescription = "Settings", tint = MaterialTheme.colorScheme.onPrimaryContainer)
+                        }
+                        
                         Icon(
                             imageVector = if (isZReadingExpanded) Icons.Default.ExpandLess else Icons.Default.ExpandMore,
                             contentDescription = "Expand/Collapse",
@@ -193,6 +204,23 @@ fun HistoryScreen(
                                     Text("-₱${String.format("%.2f", expenses)}", fontWeight = FontWeight.Bold, fontSize = 18.sp, color = MaterialTheme.colorScheme.error)
                                 }
                             }
+                            
+                            Column(modifier = Modifier.fillMaxWidth()) {
+                                Row(
+                                    modifier = Modifier.fillMaxWidth(),
+                                    horizontalArrangement = Arrangement.SpaceBetween
+                                ) {
+                                    Text("Goal Progress", fontSize = 12.sp, color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.8f))
+                                    Text("${if(targetSales > 0) ((totalSales / targetSales) * 100).toInt() else 0}%", fontSize = 12.sp, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.primary)
+                                }
+                                Spacer(modifier = Modifier.height(4.dp))
+                                LinearProgressIndicator(
+                                    progress = { if (targetSales > 0) (totalSales / targetSales).toFloat().coerceIn(0f, 1f) else 0f },
+                                    modifier = Modifier.fillMaxWidth().height(8.dp),
+                                    color = MaterialTheme.colorScheme.primary,
+                                    trackColor = MaterialTheme.colorScheme.primaryContainer
+                                )
+                            }
 
                             HorizontalDivider(color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.2f))
 
@@ -208,7 +236,7 @@ fun HistoryScreen(
                                 Column(horizontalAlignment = Alignment.End) {
                                     Text("Cash Drawer Status", fontSize = 12.sp, color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.8f))
                                     Text("₱${String.format("%.2f", cashDrawer)}", fontWeight = FontWeight.Bold, fontSize = 18.sp, color = MaterialTheme.colorScheme.onPrimaryContainer)
-                                    Text("(Float: ₱500.00)", fontSize = 10.sp, color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.6f))
+                                    Text("(Float: ₱${String.format("%.2f", startingFloat)})", fontSize = 10.sp, color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.6f))
                                 }
                             }
 
@@ -324,8 +352,17 @@ fun HistoryScreen(
                 }
             }
 
-
-        }
+            if (showConfigDialog) {
+                EditConfigDialog(
+                    initialTarget = appConfig?.targetSales ?: 5000.0,
+                    initialFloat = appConfig?.startingCashFloat ?: 500.0,
+                    onDismiss = { showConfigDialog = false },
+                    onSave = { target, float ->
+                        viewModel.updateConfig(target, float)
+                        showConfigDialog = false
+                    }
+                )
+            }        }
     }
 }
 
@@ -496,4 +533,54 @@ fun shareOrderReceipt(context: android.content.Context, order: com.example.catta
         .setText(text)
         .intent
     context.startActivity(android.content.Intent.createChooser(intent, "Share Receipt"))
+}
+
+@Composable
+fun EditConfigDialog(
+    initialTarget: Double,
+    initialFloat: Double,
+    onDismiss: () -> Unit,
+    onSave: (Double, Double) -> Unit
+) {
+    var targetStr by remember { mutableStateOf(initialTarget.toString()) }
+    var floatStr by remember { mutableStateOf(initialFloat.toString()) }
+
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = { Text("Edit Business Goals") },
+        text = {
+            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                OutlinedTextField(
+                    value = targetStr,
+                    onValueChange = { targetStr = it },
+                    label = { Text("Target Sales") },
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                    modifier = Modifier.fillMaxWidth()
+                )
+                OutlinedTextField(
+                    value = floatStr,
+                    onValueChange = { floatStr = it },
+                    label = { Text("Starting Cash Float") },
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                    modifier = Modifier.fillMaxWidth()
+                )
+            }
+        },
+        confirmButton = {
+            TextButton(
+                onClick = {
+                    val t = targetStr.toDoubleOrNull() ?: initialTarget
+                    val f = floatStr.toDoubleOrNull() ?: initialFloat
+                    onSave(t, f)
+                }
+            ) {
+                Text("Save")
+            }
+        },
+        dismissButton = {
+            TextButton(onClick = onDismiss) {
+                Text("Cancel")
+            }
+        }
+    )
 }

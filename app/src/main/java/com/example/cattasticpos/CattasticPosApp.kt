@@ -10,6 +10,8 @@ import com.example.cattasticpos.domain.repository.ExpenseRepository
 import com.example.cattasticpos.data.repository.ExpenseRepositoryImpl
 import com.example.cattasticpos.domain.repository.InventoryRepository
 import com.example.cattasticpos.data.repository.InventoryRepositoryImpl
+import com.example.cattasticpos.domain.repository.AppConfigRepository
+import com.example.cattasticpos.data.repository.AppConfigRepositoryImpl
 import com.example.cattasticpos.domain.usecase.CalculateCartUseCase
 import com.example.cattasticpos.domain.usecase.CheckoutUseCase
 import com.example.cattasticpos.domain.usecase.RestockItemUseCase
@@ -41,6 +43,7 @@ interface AppContainer {
     val exportDataUseCase: ExportDataUseCase
     val expenseRepository: ExpenseRepository
     val inventoryRepository: InventoryRepository
+    val appConfigRepository: AppConfigRepository
     val restockItemUseCase: RestockItemUseCase
 }
 
@@ -79,6 +82,10 @@ class AppContainerImpl(
 
     override val inventoryRepository: InventoryRepository by lazy {
         InventoryRepositoryImpl(database.inventoryDao())
+    }
+
+    override val appConfigRepository: AppConfigRepository by lazy {
+        AppConfigRepositoryImpl(database.appConfigDao())
     }
 
     override val exportDataUseCase: ExportDataUseCase by lazy {

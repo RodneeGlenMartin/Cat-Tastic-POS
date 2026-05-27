@@ -10,6 +10,8 @@ import com.example.cattasticpos.domain.repository.OrderRepository
 import com.example.cattasticpos.domain.repository.ExpenseRepository
 import com.example.cattasticpos.domain.model.Expense
 import com.example.cattasticpos.domain.usecase.ExportDataUseCase
+import com.example.cattasticpos.domain.repository.AppConfigRepository
+import com.example.cattasticpos.domain.model.AppConfig
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -21,7 +23,8 @@ import java.util.Calendar
 class HistoryViewModel(
     private val orderRepository: OrderRepository,
     private val expenseRepository: ExpenseRepository,
-    private val exportDataUseCase: ExportDataUseCase
+    private val exportDataUseCase: ExportDataUseCase,
+    private val appConfigRepository: AppConfigRepository
 ) : ViewModel() {
 
     private val todayStart: Long
@@ -73,6 +76,15 @@ class HistoryViewModel(
     val totalExpensesState: StateFlow<Double?> = expenseRepository.getTotalExpensesForDay(todayStart, todayEnd)
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), 0.0)
 
+    val appConfigState: StateFlow<AppConfig?> = appConfigRepository.getAppConfig()
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), null)
+
+    fun updateConfig(targetSales: Double, startingCashFloat: Double) {
+        viewModelScope.launch {
+            appConfigRepository.updateConfig(targetSales, startingCashFloat)
+        }
+    }
+
     fun deleteOrder(orderId: String) {
         viewModelScope.launch {
             orderRepository.deleteOrder(orderId)
@@ -107,7 +119,8 @@ class HistoryViewModel(
                 return HistoryViewModel(
                     application.container.orderRepository,
                     application.container.expenseRepository,
-                    application.container.exportDataUseCase
+                    application.container.exportDataUseCase,
+                    application.container.appConfigRepository
                 ) as T
             }
         }

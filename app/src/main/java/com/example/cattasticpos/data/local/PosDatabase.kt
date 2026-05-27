@@ -17,6 +17,8 @@ import com.example.cattasticpos.data.local.entity.InventoryEntity
 import com.example.cattasticpos.data.local.dao.InventoryDao
 import com.example.cattasticpos.data.local.entity.RecipeMappingEntity
 import com.example.cattasticpos.data.local.dao.RecipeDao
+import com.example.cattasticpos.data.local.entity.AppConfigEntity
+import com.example.cattasticpos.data.local.dao.AppConfigDao
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -29,9 +31,10 @@ import kotlinx.coroutines.launch
         OrderItemEntity::class,
         ExpenseEntity::class,
         InventoryEntity::class,
-        RecipeMappingEntity::class
+        RecipeMappingEntity::class,
+        AppConfigEntity::class
     ],
-    version = 6,
+    version = 7,
     exportSchema = false
 )
 abstract class PosDatabase : RoomDatabase() {
@@ -40,6 +43,7 @@ abstract class PosDatabase : RoomDatabase() {
     abstract fun expenseDao(): ExpenseDao
     abstract fun inventoryDao(): InventoryDao
     abstract fun recipeDao(): RecipeDao
+    abstract fun appConfigDao(): AppConfigDao
 
     companion object {
         @Volatile
@@ -68,12 +72,14 @@ abstract class PosDatabase : RoomDatabase() {
             super.onCreate(db)
             INSTANCE?.let { database ->
                 scope.launch(Dispatchers.IO) {
-                    prepopulateDatabase(database.menuDao(), database.inventoryDao(), database.recipeDao())
+                    prepopulateDatabase(database.menuDao(), database.inventoryDao(), database.recipeDao(), database.appConfigDao())
                 }
             }
         }
 
-        private suspend fun prepopulateDatabase(menuDao: MenuDao, inventoryDao: InventoryDao, recipeDao: RecipeDao) {
+        private suspend fun prepopulateDatabase(menuDao: MenuDao, inventoryDao: InventoryDao, recipeDao: RecipeDao, appConfigDao: AppConfigDao) {
+            appConfigDao.insertConfig(AppConfigEntity(id = 1, targetSales = 5000.0, startingCashFloat = 500.0))
+            
             val categories = listOf(
                 CategoryEntity("cat_bites", "Cat-Tastic Bites"),
                 CategoryEntity("cat_drinks", "Cat-Tastic Drinks")
