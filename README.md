@@ -1,7 +1,7 @@
 # Cat-Tastic Bites POS
 
 ## Project Overview
-**Cat-Tastic Bites POS** is a fully featured, offline-first Android Point-of-Sale (POS) application designed for a cat-themed food stand. It manages menus, dynamic inventory recipes, orders, split payments, and end-of-day financial reporting without requiring a constant internet connection.
+**Cat-Tastic Bites POS** is a fully featured, offline-first Android Point-of-Sale (POS) application designed for a cat-themed business. It manages menus, dynamic inventory recipes, orders, split payments, and end-of-day financial reporting without requiring a constant internet connection.
 
 ## Key Features
 * **Dynamic Inventory Engine (Recipe/BOM mapping):** Link custom raw materials to specific menu variants for accurate, real-time stock deduction during checkout.
