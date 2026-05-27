@@ -7,6 +7,11 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.ui.platform.LocalContext
+import android.content.Context
+import android.content.Intent
+import androidx.core.app.ShareCompat
+import androidx.compose.material.icons.filled.Share
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.ExpandLess
@@ -86,7 +91,7 @@ fun HistoryScreen(
                 .background(MaterialTheme.colorScheme.background)
                 .padding(16.dp)
         ) {
-            var orderToDelete by remember { mutableStateOf<Order?>(null) }
+            val context = LocalContext.current
             var isZReadingExpanded by remember { mutableStateOf(false) }
 
             val todayStart = remember {
@@ -313,32 +318,13 @@ fun HistoryScreen(
                     items(orders, key = { it.id }) { order ->
                         OrderHistoryCard(
                             order = order,
-                            onDelete = { orderToDelete = order }
+                            onShare = { shareOrderReceipt(context, order) }
                         )
                     }
                 }
             }
 
-            if (orderToDelete != null) {
-                AlertDialog(
-                    onDismissRequest = { orderToDelete = null },
-                    title = { Text("Void Order?", fontWeight = FontWeight.Bold) },
-                    text = { Text("Are you sure you want to permanently delete this transaction? This will update your daily totals.") },
-                    confirmButton = {
-                        TextButton(onClick = {
-                            viewModel.deleteOrder(orderToDelete!!.id)
-                            orderToDelete = null
-                        }) {
-                            Text("Delete", color = MaterialTheme.colorScheme.error)
-                        }
-                    },
-                    dismissButton = {
-                        TextButton(onClick = { orderToDelete = null }) {
-                            Text("Cancel")
-                        }
-                    }
-                )
-            }
+
         }
     }
 }
@@ -346,7 +332,7 @@ fun HistoryScreen(
 @Composable
 fun OrderHistoryCard(
     order: Order,
-    onDelete: () -> Unit,
+    onShare: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     val dateFormatter = remember {
@@ -399,13 +385,13 @@ fun OrderHistoryCard(
                         }
                         Spacer(modifier = Modifier.width(4.dp))
                         IconButton(
-                            onClick = onDelete,
+                            onClick = onShare,
                             modifier = Modifier.size(24.dp)
                         ) {
                             Icon(
-                                imageVector = Icons.Default.Delete,
-                                contentDescription = "Delete Order",
-                                tint = MaterialTheme.colorScheme.error,
+                                imageVector = Icons.Default.Share,
+                                contentDescription = "Share Receipt",
+                                tint = MaterialTheme.colorScheme.primary,
                                 modifier = Modifier.size(16.dp)
                             )
                         }
@@ -494,4 +480,20 @@ fun OrderHistoryCard(
             }
         }
     }
+}
+
+fun shareOrderReceipt(context: android.content.Context, order: com.example.cattasticpos.domain.model.Order) {
+    val text = """
+        Cat-Tastic Bites POS Receipt
+        Order ID: ${order.id}
+        Date: ${java.text.SimpleDateFormat("yyyy-MM-dd HH:mm:ss", java.util.Locale.getDefault()).format(java.util.Date(order.timestamp))}
+        Total: Php ${String.format("%.2f", order.total)}
+        Payment: ${order.paymentMethod}
+    """.trimIndent()
+
+    val intent = androidx.core.app.ShareCompat.IntentBuilder(context)
+        .setType("text/plain")
+        .setText(text)
+        .intent
+    context.startActivity(android.content.Intent.createChooser(intent, "Share Receipt"))
 }

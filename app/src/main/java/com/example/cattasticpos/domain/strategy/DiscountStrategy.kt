@@ -21,6 +21,12 @@ class PercentageDiscountStrategy(val pct: Double) : DiscountStrategy {
     }
 }
 
+class FivePercentDiscountStrategy : DiscountStrategy {
+    override fun applyDiscount(subTotal: Double, items: List<CartItem>): DiscountResult {
+        return DiscountResult(subTotal * 0.05, "5% OFF")
+    }
+}
+
 class FreeOrderDiscountStrategy : DiscountStrategy {
     override fun applyDiscount(subTotal: Double, items: List<CartItem>): DiscountResult {
         return DiscountResult(subTotal, "100% Free Order Coupon Applied")

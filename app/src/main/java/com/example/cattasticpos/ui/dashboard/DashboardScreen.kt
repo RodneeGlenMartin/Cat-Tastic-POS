@@ -35,6 +35,7 @@ import com.example.cattasticpos.domain.strategy.DiscountStrategy
 import com.example.cattasticpos.domain.strategy.FreeOrderDiscountStrategy
 import com.example.cattasticpos.domain.strategy.NoDiscountStrategy
 import com.example.cattasticpos.domain.strategy.PercentageDiscountStrategy
+import com.example.cattasticpos.domain.strategy.FivePercentDiscountStrategy
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -217,6 +218,7 @@ fun DashboardScreen(
                         horizontalArrangement = Arrangement.spacedBy(4.dp)
                     ) {
                         DiscountButton("None", uiState.selectedDiscountStrategy is NoDiscountStrategy, { viewModel.selectDiscount(NoDiscountStrategy()) }, Modifier.weight(1f))
+                        DiscountButton("5%", uiState.selectedDiscountStrategy is FivePercentDiscountStrategy, { viewModel.selectDiscount(FivePercentDiscountStrategy()) }, Modifier.weight(1f))
                         DiscountButton("10%", uiState.selectedDiscountStrategy is PercentageDiscountStrategy && (uiState.selectedDiscountStrategy as PercentageDiscountStrategy).pct == 10.0, { viewModel.selectDiscount(PercentageDiscountStrategy(10.0)) }, Modifier.weight(1f))
                         DiscountButton("20%", uiState.selectedDiscountStrategy is PercentageDiscountStrategy && (uiState.selectedDiscountStrategy as PercentageDiscountStrategy).pct == 20.0, { viewModel.selectDiscount(PercentageDiscountStrategy(20.0)) }, Modifier.weight(1f))
                         DiscountButton("Free", uiState.selectedDiscountStrategy is FreeOrderDiscountStrategy, { viewModel.selectDiscount(FreeOrderDiscountStrategy()) }, Modifier.weight(1.2f))
