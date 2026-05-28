@@ -559,13 +559,16 @@ fun OrderHistoryCard(
                         Text(
                             text = "🐾 ${item.quantity} x ${item.itemName} (${item.variantName}$flavorText)",
                             fontSize = 12.sp,
-                            color = MaterialTheme.colorScheme.onSurface
+                            color = MaterialTheme.colorScheme.onSurface,
+                            modifier = Modifier.weight(1f)
                         )
+                        Spacer(modifier = Modifier.width(8.dp))
                         Text(
                             text = "₱${String.format("%.0f", item.totalPrice)}",
                             fontSize = 12.sp,
                             fontWeight = FontWeight.Medium,
-                            color = MaterialTheme.colorScheme.onSurface
+                            color = MaterialTheme.colorScheme.onSurface,
+                            maxLines = 1
                         )
                     }
                 }
