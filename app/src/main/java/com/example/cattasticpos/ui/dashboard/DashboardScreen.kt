@@ -72,7 +72,7 @@ fun DashboardScreen(
                         Image(
                             painter = painterResource(id = R.drawable.logo),
                             contentDescription = "Brew ni Cat Logo",
-                            modifier = Modifier.size(28.dp).clip(CircleShape)
+                            modifier = Modifier.size(28.dp)
                         )
                         Spacer(modifier = Modifier.width(8.dp))
                         Text("Brew ni Cat", fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.primary, fontSize = 18.sp, maxLines = 1, overflow = TextOverflow.Ellipsis)
@@ -93,9 +93,9 @@ fun DashboardScreen(
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.surface,
-                    titleContentColor = MaterialTheme.colorScheme.primary,
-                    actionIconContentColor = MaterialTheme.colorScheme.primary
+                    containerColor = MaterialTheme.colorScheme.primary,
+                    titleContentColor = MaterialTheme.colorScheme.onPrimary,
+                    actionIconContentColor = MaterialTheme.colorScheme.onPrimary
                 )
             )
         },
@@ -166,8 +166,8 @@ fun DashboardScreen(
                         Row(verticalAlignment = Alignment.CenterVertically) {
                             Text("Current Order", fontWeight = FontWeight.Bold, style = MaterialTheme.typography.titleMedium)
                             Spacer(modifier = Modifier.width(8.dp))
-                            Badge(containerColor = MaterialTheme.colorScheme.primary) {
-                                Text(uiState.activeCart.sumOf { it.quantity }.toString(), fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.onPrimary)
+                            Badge(containerColor = MaterialTheme.colorScheme.secondary) {
+                                Text(uiState.activeCart.sumOf { it.quantity }.toString(), fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.onSecondary)
                             }
                         }
                         TextButton(
