@@ -65,7 +65,7 @@ private val DarkColorScheme = darkColorScheme(
 
 @Composable
 fun CattasticTheme(
-    darkTheme: Boolean = false, // Forced light theme for cozy coffee shop vibe
+    darkTheme: Boolean = androidx.compose.foundation.isSystemInDarkTheme(),
     content: @Composable () -> Unit
 ) {
     val colorScheme = if (darkTheme) DarkColorScheme else LightColorScheme
