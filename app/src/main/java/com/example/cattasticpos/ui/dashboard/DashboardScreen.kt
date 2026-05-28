@@ -67,12 +67,16 @@ fun DashboardScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { 
-                    Image(
-                        painter = painterResource(id = R.drawable.logo),
-                        contentDescription = "Brew ni Cat Logo",
-                        modifier = Modifier.size(40.dp)
-                    )
+                title = {
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Image(
+                            painter = painterResource(id = R.drawable.logo),
+                            contentDescription = "Brew ni Cat Logo",
+                            modifier = Modifier.size(40.dp)
+                        )
+                        Spacer(modifier = Modifier.width(12.dp))
+                        Text("Brew-ni-Cat", fontWeight = FontWeight.Bold)
+                    }
                 },
                 actions = {
                     IconButton(onClick = onNavigateToInventory) {
