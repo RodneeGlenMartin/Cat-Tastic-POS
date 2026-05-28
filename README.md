@@ -1,7 +1,7 @@
-# Cat-Tastic Bites POS
+# Brew-Ni-Cat Coffee Shop POS
 
 ## Project Overview
-**Cat-Tastic Bites POS** is a fully featured, offline-first Android Point-of-Sale (POS) application designed for a cat-themed business. It manages menus, dynamic inventory recipes, orders, split payments, and end-of-day financial reporting without requiring a constant internet connection.
+**Brew-Ni-Cat Coffee Shop POS** is a fully featured, offline-first Android Point-of-Sale (POS) application designed for a cat-themed business. It manages menus, dynamic inventory recipes, orders, split payments, and end-of-day financial reporting without requiring a constant internet connection.
 
 ## Key Features
 * **Dynamic Inventory Engine (Recipe/BOM mapping):** Link custom raw materials to specific menu variants for accurate, real-time stock deduction during checkout.
@@ -27,7 +27,7 @@
 ## License
 MIT License
 
-Copyright (c) 2026 Cat-Tastic Bites
+Copyright (c) 2026 Brew-Ni-Cat Coffee Shop
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
