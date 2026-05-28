@@ -34,7 +34,7 @@ import kotlinx.coroutines.launch
         RecipeMappingEntity::class,
         AppConfigEntity::class
     ],
-    version = 7,
+    version = 8,
     exportSchema = false
 )
 abstract class PosDatabase : RoomDatabase() {
@@ -82,7 +82,8 @@ abstract class PosDatabase : RoomDatabase() {
             
             val categories = listOf(
                 CategoryEntity("cat_bites", "Cat-Tastic Bites"),
-                CategoryEntity("cat_drinks", "Cat-Tastic Drinks")
+                CategoryEntity("cat_drinks", "Cat-Tastic Drinks"),
+                CategoryEntity("combos", "Combos & Packages")
             )
             menuDao.insertCategories(categories)
 
@@ -148,12 +149,29 @@ abstract class PosDatabase : RoomDatabase() {
                     id = "drink_coffee",
                     categoryId = "cat_drinks",
                     name = "Cat-Feine (Coffee)",
-                    flavors = "Classic: Americano|Classic: Latte|Classic: Cappuccino|Classic: Espresso|Oreo: Oreo Latte|Oreo: Oreo Frappe|Oreo: Oreo Cappuccino|Matcha: Matcha Latte|Matcha: Matcha Frappe|Matcha: Matcha Espresso|Sweet Filipino: Kapeng Barako|Sweet Filipino: Cafe de Yema|Sweet Filipino: Dirty Horchata",
+                    flavors = "Classic: Salted Caramel Latte|Classic: Vanilla Iced Latte|Classic: Hazelnut Latte|Classic: Caramel Macchiato|Classic: Salted Caramel Hazelnut|Oreo: Caramel Oreo Coffee|Oreo: Oreo Iced Latte|Oreo: Vanilla Oreo Latte|Matcha: Dirty Matcha|Matcha: Vanilla Matcha Latte|Matcha: Caramel Matcha|Sweet Filipino: Condensed Milk Coffee|Sweet Filipino: Sea Salt Caramel Coffee",
                     variantsJson = """
                         [
                           {"id":"12oz","name":"12oz","basePrice":49.0,"priceByFlavor":{}},
                           {"id":"16oz","name":"16oz","basePrice":59.0,"priceByFlavor":{}},
                           {"id":"22oz","name":"22oz","basePrice":79.0,"priceByFlavor":{}}
+                        ]
+                    """.trimIndent()
+                ),
+                ItemEntity(
+                    id = "combo_meals",
+                    categoryId = "combos",
+                    name = "Combo Meals",
+                    flavors = "",
+                    variantsJson = """
+                        [
+                          {"id":"combo_1","name":"The Classy Cat Combo","basePrice":104.0,"priceByFlavor":{}},
+                          {"id":"combo_2","name":"The Fizzy Kitten","basePrice":89.0,"priceByFlavor":{}},
+                          {"id":"combo_3","name":"The Sweet Puspin","basePrice":138.0,"priceByFlavor":{}},
+                          {"id":"combo_4","name":"The Two-Tail","basePrice":228.0,"priceByFlavor":{}},
+                          {"id":"combo_5","name":"Matcha Made in Heaven","basePrice":217.0,"priceByFlavor":{}},
+                          {"id":"combo_6","name":"Litter Box Feast","basePrice":496.0,"priceByFlavor":{}},
+                          {"id":"combo_7","name":"Ultimate Alley Cat Party","basePrice":725.0,"priceByFlavor":{}}
                         ]
                     """.trimIndent()
                 )
