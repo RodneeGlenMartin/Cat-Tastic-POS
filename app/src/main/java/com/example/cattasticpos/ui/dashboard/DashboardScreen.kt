@@ -455,7 +455,7 @@ fun ProductConfigBottomSheet(item: Item, onDismiss: () -> Unit, onAddToCart: (Va
                             Text(group, fontSize = 12.sp, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.primary, modifier = Modifier.padding(vertical = 2.dp))
                             FlowRow(horizontalArrangement = Arrangement.spacedBy(6.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) {
                                 flavorsInGroup.forEach { flavor ->
-                                    FilterChip(selected = selectedFlavor == flavor, onClick = { selectedFlavor = flavor }, label = { Text(flavor.substringAfter(": ").trim()) }, shape = RoundedCornerShape(8.dp))
+                                    FilterChip(selected = selectedFlavor == flavor, onClick = { selectedFlavor = flavor }, label = { Text(flavor.substringAfter(": ").trim()) }, colors = FilterChipDefaults.filterChipColors(selectedContainerColor = MaterialTheme.colorScheme.secondary, selectedLabelColor = MaterialTheme.colorScheme.onSecondary), shape = RoundedCornerShape(8.dp))
                                 }
                             }
                         }
@@ -463,7 +463,7 @@ fun ProductConfigBottomSheet(item: Item, onDismiss: () -> Unit, onAddToCart: (Va
                 } else {
                     FlowRow(horizontalArrangement = Arrangement.spacedBy(6.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
                         item.flavors.forEach { flavor ->
-                            FilterChip(selected = selectedFlavor == flavor, onClick = { selectedFlavor = flavor }, label = { Text(flavor) }, shape = RoundedCornerShape(8.dp))
+                            FilterChip(selected = selectedFlavor == flavor, onClick = { selectedFlavor = flavor }, label = { Text(flavor) }, colors = FilterChipDefaults.filterChipColors(selectedContainerColor = MaterialTheme.colorScheme.secondary, selectedLabelColor = MaterialTheme.colorScheme.onSecondary), shape = RoundedCornerShape(8.dp))
                         }
                     }
                 }
@@ -474,7 +474,7 @@ fun ProductConfigBottomSheet(item: Item, onDismiss: () -> Unit, onAddToCart: (Va
                 Spacer(modifier = Modifier.height(8.dp))
                 FlowRow(horizontalArrangement = Arrangement.spacedBy(6.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
                     item.variants.forEach { variant ->
-                        FilterChip(selected = selectedVariant.id == variant.id, onClick = { selectedVariant = variant }, label = { Text("${variant.name} (+₱${String.format("%.0f", variant.getPrice(selectedFlavor))})") }, shape = RoundedCornerShape(8.dp))
+                        FilterChip(selected = selectedVariant.id == variant.id, onClick = { selectedVariant = variant }, label = { Text("${variant.name} (+₱${String.format("%.0f", variant.getPrice(selectedFlavor))})") }, colors = FilterChipDefaults.filterChipColors(selectedContainerColor = MaterialTheme.colorScheme.secondary, selectedLabelColor = MaterialTheme.colorScheme.onSecondary), shape = RoundedCornerShape(8.dp))
                     }
                 }
                 Spacer(modifier = Modifier.height(24.dp))
@@ -549,3 +549,4 @@ fun AddExpenseDialog(onSave: (String, Double, String) -> Unit, onDismiss: () -> 
         dismissButton = { TextButton(onClick = onDismiss) { Text("Cancel") } }
     )
 }
+
