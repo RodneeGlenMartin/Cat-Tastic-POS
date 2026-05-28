@@ -265,7 +265,7 @@ fun HistoryScreen(
                                 modifier = Modifier.fillMaxWidth(),
                                 horizontalArrangement = Arrangement.SpaceBetween
                             ) {
-                                Text("CASH: ₱${String.format("%.0f", totalCash)} (${(cashWeight * 100).toInt()}%)", fontSize = 10.sp, color = MaterialTheme.colorScheme.primary, fontWeight = FontWeight.Bold)
+                                Text("CASH: ₱${String.format("%.0f", totalCash)} (${(cashWeight * 100).toInt()}%)", fontSize = 10.sp, color = androidx.compose.ui.graphics.Color(0xFF4CAF50), fontWeight = FontWeight.Bold)
                                 Text("GCASH: ₱${String.format("%.0f", totalGcash)} (${(gcashWeight * 100).toInt()}%)", fontSize = 10.sp, color = MaterialTheme.colorScheme.tertiary, fontWeight = FontWeight.Bold)
                             }
 
@@ -521,7 +521,7 @@ fun OrderHistoryCard(
 
 fun shareOrderReceipt(context: android.content.Context, order: com.example.cattasticpos.domain.model.Order) {
     val text = """
-        Brew-Ni-Cat Coffee Shop Receipt
+        Brew ni Cat Receipt
         Order ID: ${order.id}
         Date: ${java.text.SimpleDateFormat("yyyy-MM-dd HH:mm:ss", java.util.Locale.getDefault()).format(java.util.Date(order.timestamp))}
         Total: Php ${String.format("%.0f", order.total)}
