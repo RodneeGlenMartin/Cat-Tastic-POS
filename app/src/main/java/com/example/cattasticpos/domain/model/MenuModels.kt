@@ -9,7 +9,8 @@ data class Variant(
     val id: String,
     val name: String,
     val basePrice: Double,
-    val priceByFlavor: Map<String, Double> = emptyMap()
+    val priceByFlavor: Map<String, Double> = emptyMap(),
+    val description: String? = null
 ) {
     fun getPrice(flavor: String?): Double {
         if (flavor != null) {

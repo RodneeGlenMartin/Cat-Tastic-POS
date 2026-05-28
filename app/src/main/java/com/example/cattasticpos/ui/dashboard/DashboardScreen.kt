@@ -481,6 +481,12 @@ fun ProductConfigBottomSheet(item: Item, onDismiss: () -> Unit, onAddToCart: (Va
                         FilterChip(selected = selectedVariant.id == variant.id, onClick = { selectedVariant = variant }, label = { Text("${variant.name} (+₱${String.format("%.0f", variant.getPrice(selectedFlavor))})") }, colors = FilterChipDefaults.filterChipColors(selectedContainerColor = MaterialTheme.colorScheme.secondary, selectedLabelColor = MaterialTheme.colorScheme.onSecondary), shape = RoundedCornerShape(8.dp))
                     }
                 }
+                Spacer(modifier = Modifier.height(12.dp))
+                if (selectedVariant.description != null) {
+                    Text("Included in this combo:", fontWeight = FontWeight.Bold, fontSize = 12.sp, color = MaterialTheme.colorScheme.primary)
+                    Spacer(modifier = Modifier.height(4.dp))
+                    Text(selectedVariant.description!!, fontSize = 12.sp, color = MaterialTheme.colorScheme.onSurface, lineHeight = 16.sp)
+                }
                 Spacer(modifier = Modifier.height(24.dp))
             }
             Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
