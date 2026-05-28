@@ -521,7 +521,7 @@ fun OrderHistoryCard(
 
 fun shareOrderReceipt(context: android.content.Context, order: com.example.cattasticpos.domain.model.Order) {
     val text = """
-        Cat-Tastic Bites POS Receipt
+        Brew-Ni-Cat Coffee Shop Receipt
         Order ID: ${order.id}
         Date: ${java.text.SimpleDateFormat("yyyy-MM-dd HH:mm:ss", java.util.Locale.getDefault()).format(java.util.Date(order.timestamp))}
         Total: Php ${String.format("%.2f", order.total)}
