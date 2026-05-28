@@ -12,6 +12,7 @@ import androidx.compose.ui.res.painterResource
 import com.example.cattasticpos.R
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.clickable
+import kotlinx.coroutines.launch
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
@@ -59,14 +60,18 @@ fun DashboardScreen(
 
     LaunchedEffect(uiState.checkoutSuccessEvent) {
         uiState.checkoutSuccessEvent?.let { message ->
-            snackbarHostState.showSnackbar(message)
+            val job = launch { snackbarHostState.showSnackbar(message) }
+            kotlinx.coroutines.delay(2000)
+            job.cancel()
             viewModel.clearCheckoutEvent()
         }
     }
 
     LaunchedEffect(uiState.snackbarMessage) {
         uiState.snackbarMessage?.let { message ->
-            snackbarHostState.showSnackbar(message)
+            val job = launch { snackbarHostState.showSnackbar(message) }
+            kotlinx.coroutines.delay(1000)
+            job.cancel()
             viewModel.clearSnackbarMessage()
         }
     }
