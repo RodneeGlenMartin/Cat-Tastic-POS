@@ -1,7 +1,7 @@
 package com.example.cattasticpos.domain.usecase
 
-import com.example.cattasticpos.data.local.dao.InventoryDao
-import com.example.cattasticpos.data.local.dao.RecipeDao
+import com.example.cattasticpos.domain.repository.InventoryRepository
+import com.example.cattasticpos.domain.repository.RecipeRepository
 import com.example.cattasticpos.domain.model.CartItem
 import com.example.cattasticpos.domain.model.Order
 import com.example.cattasticpos.domain.model.OrderItem
@@ -11,8 +11,8 @@ import java.util.UUID
 
 class CheckoutUseCase(
     private val orderRepository: OrderRepository,
-    private val inventoryDao: InventoryDao,
-    private val recipeDao: RecipeDao,
+    private val inventoryRepository: InventoryRepository,
+    private val recipeRepository: RecipeRepository,
     private val calculateCartUseCase: CalculateCartUseCase = CalculateCartUseCase()
 ) {
     suspend operator fun invoke(
@@ -57,11 +57,11 @@ class CheckoutUseCase(
             // Deduct inventory dynamically using Recipe Mappings
             items.forEach { cartItem ->
                 val qty = cartItem.quantity
-                val mappings = recipeDao.getMappingsForCheckout(cartItem.item.id, cartItem.variant.name)
+                val mappings = recipeRepository.getMappingsForCheckout(cartItem.item.id, cartItem.variant.name)
                 mappings.forEach { mapping ->
                     val totalDeduction = (mapping.deductionQuantity * qty).toInt()
                     if (totalDeduction > 0) {
-                        inventoryDao.decrementStock(mapping.inventoryItemId, totalDeduction)
+                        inventoryRepository.decrementStock(mapping.inventoryItemId, (mapping.deductionQuantity * cartItem.quantity).toInt())
                     }
                 }
             }

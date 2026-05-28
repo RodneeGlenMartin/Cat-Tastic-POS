@@ -10,6 +10,8 @@ import com.example.cattasticpos.domain.repository.ExpenseRepository
 import com.example.cattasticpos.data.repository.ExpenseRepositoryImpl
 import com.example.cattasticpos.domain.repository.InventoryRepository
 import com.example.cattasticpos.data.repository.InventoryRepositoryImpl
+import com.example.cattasticpos.domain.repository.RecipeRepository
+import com.example.cattasticpos.data.repository.RecipeRepositoryImpl
 import com.example.cattasticpos.domain.repository.AppConfigRepository
 import com.example.cattasticpos.data.repository.AppConfigRepositoryImpl
 import com.example.cattasticpos.domain.usecase.CalculateCartUseCase
@@ -43,6 +45,7 @@ interface AppContainer {
     val exportDataUseCase: ExportDataUseCase
     val expenseRepository: ExpenseRepository
     val inventoryRepository: InventoryRepository
+    val recipeRepository: RecipeRepository
     val appConfigRepository: AppConfigRepository
     val restockItemUseCase: RestockItemUseCase
 }
@@ -73,7 +76,7 @@ class AppContainerImpl(
     }
 
     override val checkoutUseCase: CheckoutUseCase by lazy {
-        CheckoutUseCase(orderRepository, database.inventoryDao(), database.recipeDao(), calculateCartUseCase)
+        CheckoutUseCase(orderRepository, inventoryRepository, recipeRepository, calculateCartUseCase)
     }
 
     override val expenseRepository: ExpenseRepository by lazy {
@@ -82,6 +85,10 @@ class AppContainerImpl(
 
     override val inventoryRepository: InventoryRepository by lazy {
         InventoryRepositoryImpl(database.inventoryDao())
+    }
+
+    override val recipeRepository: RecipeRepository by lazy {
+        RecipeRepositoryImpl(database.recipeDao())
     }
 
     override val appConfigRepository: AppConfigRepository by lazy {

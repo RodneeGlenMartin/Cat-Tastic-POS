@@ -18,7 +18,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.cattasticpos.data.local.entity.InventoryEntity
+import com.example.cattasticpos.domain.model.InventoryItem
 import com.example.cattasticpos.data.local.entity.RecipeMappingEntity
 import com.example.cattasticpos.domain.model.Item
 
@@ -115,7 +115,7 @@ fun InventoryScreen(
 
 @Composable
 fun RawMaterialsTab(
-    inventoryItems: List<InventoryEntity>,
+    inventoryItems: List<InventoryItem>,
     onRestock: (String, Int) -> Unit
 ) {
     if (inventoryItems.isEmpty()) {
@@ -343,12 +343,12 @@ fun AddRawMaterialDialog(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun LinkIngredientDialog(
-    inventoryItems: List<InventoryEntity>,
+    inventoryItems: List<InventoryItem>,
     onSave: (String, Double) -> Unit,
     onDismiss: () -> Unit
 ) {
     var expanded by remember { mutableStateOf(false) }
-    var selectedItem by remember { mutableStateOf<InventoryEntity?>(null) }
+    var selectedItem by remember { mutableStateOf<InventoryItem?>(null) }
     var qtyStr by remember { mutableStateOf("") }
 
     AlertDialog(

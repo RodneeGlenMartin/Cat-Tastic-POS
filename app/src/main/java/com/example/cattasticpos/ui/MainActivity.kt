@@ -16,6 +16,7 @@ import com.example.cattasticpos.ui.history.HistoryScreen
 import com.example.cattasticpos.ui.history.HistoryViewModel
 import com.example.cattasticpos.ui.inventory.InventoryScreen
 import com.example.cattasticpos.ui.inventory.InventoryViewModel
+import com.example.cattasticpos.ui.components.PinScreen
 
 private val LightColorScheme = lightColorScheme(
     primary = Color(0xFF3E5C49),       // Forest Green
@@ -95,8 +96,20 @@ class MainActivity : ComponentActivity() {
                             "dashboard" -> {
                                 DashboardScreen(
                                     viewModel = dashboardViewModel,
-                                    onNavigateToHistory = { currentScreen = "history" },
-                                    onNavigateToInventory = { currentScreen = "inventory" }
+                                    onNavigateToHistory = { currentScreen = "pin_history" },
+                                    onNavigateToInventory = { currentScreen = "pin_inventory" }
+                                )
+                            }
+                            "pin_history" -> {
+                                PinScreen(
+                                    onPinSuccess = { currentScreen = "history" },
+                                    onCancel = { currentScreen = "dashboard" }
+                                )
+                            }
+                            "pin_inventory" -> {
+                                PinScreen(
+                                    onPinSuccess = { currentScreen = "inventory" },
+                                    onCancel = { currentScreen = "dashboard" }
                                 )
                             }
                             "history" -> {

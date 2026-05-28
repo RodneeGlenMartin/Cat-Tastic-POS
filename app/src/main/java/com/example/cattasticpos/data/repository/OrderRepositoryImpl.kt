@@ -13,8 +13,8 @@ class OrderRepositoryImpl(
     private val orderDao: OrderDao
 ) : OrderRepository {
 
-    override fun getOrdersWithItems(): Flow<List<Order>> {
-        return orderDao.getOrdersWithItems().map { list ->
+    override fun getOrdersWithItems(startDate: Long, endDate: Long, limit: Int, offset: Int): Flow<List<Order>> {
+        return orderDao.getOrdersWithItems(startDate, endDate, limit, offset).map { list ->
             list.map { wrapper ->
                 Order(
                     id = wrapper.order.id,

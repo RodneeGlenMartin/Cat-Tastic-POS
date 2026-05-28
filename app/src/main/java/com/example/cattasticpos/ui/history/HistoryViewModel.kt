@@ -17,6 +17,9 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.launch
 import java.util.Calendar
 
@@ -45,12 +48,30 @@ class HistoryViewModel(
         todayEnd = calendar.timeInMillis
     }
 
-    val ordersState: StateFlow<List<Order>> = orderRepository.getOrdersWithItems()
-        .stateIn(
-            scope = viewModelScope,
-            started = SharingStarted.WhileSubscribed(5000),
-            initialValue = emptyList()
-        )
+    private val _startDate = MutableStateFlow<Long>(0L)
+    private val _endDate = MutableStateFlow<Long>(Long.MAX_VALUE)
+    private val _limit = MutableStateFlow<Int>(50)
+
+    @OptIn(ExperimentalCoroutinesApi::class)
+    val ordersState: StateFlow<List<Order>> = combine(_startDate, _endDate, _limit) { start, end, limit -> 
+        Triple(start, end, limit) 
+    }.flatMapLatest { (start, end, limit) ->
+        orderRepository.getOrdersWithItems(start, end, limit, 0)
+    }.stateIn(
+        scope = viewModelScope,
+        started = SharingStarted.WhileSubscribed(5000),
+        initialValue = emptyList()
+    )
+
+    fun loadMoreOrders() {
+        _limit.value += 50
+    }
+
+    fun setDateRange(start: Long?, end: Long?) {
+        _startDate.value = start ?: 0L
+        _endDate.value = end ?: Long.MAX_VALUE
+        _limit.value = 50
+    }
 
     val grossSalesState: StateFlow<Double?> = orderRepository.getGrossSalesForDay(todayStart, todayEnd)
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), 0.0)

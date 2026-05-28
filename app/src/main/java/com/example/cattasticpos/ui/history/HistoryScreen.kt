@@ -20,6 +20,7 @@ import androidx.compose.material.icons.filled.Share
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.foundation.text.KeyboardOptions
 import com.example.cattasticpos.domain.model.AppConfig
@@ -61,6 +62,7 @@ fun HistoryScreen(
     val exportMessage by viewModel.exportMessage.collectAsState()
     val appConfig by viewModel.appConfigState.collectAsState()
     val snackbarHostState = remember { SnackbarHostState() }
+    var showDateRangeDialog by remember { mutableStateOf(false) }
     
     LaunchedEffect(exportMessage) {
         exportMessage?.let {
@@ -87,6 +89,11 @@ fun HistoryScreen(
                         )
                     }
                 },
+                actions = {
+                    IconButton(onClick = { showDateRangeDialog = true }) {
+                        Icon(imageVector = Icons.Default.DateRange, contentDescription = "Filter by Date")
+                    }
+                },
                 colors = TopAppBarDefaults.topAppBarColors(
                     containerColor = MaterialTheme.colorScheme.primary,
                     titleContentColor = MaterialTheme.colorScheme.onPrimary,
@@ -107,6 +114,7 @@ fun HistoryScreen(
             val context = LocalContext.current
             var isZReadingExpanded by remember { mutableStateOf(false) }
             var showConfigDialog by remember { mutableStateOf(false) }
+            var showDateRangeDialog by remember { mutableStateOf(false) }
             var startAnimation by remember { mutableStateOf(false) }
 
             LaunchedEffect(Unit) {
@@ -138,7 +146,7 @@ fun HistoryScreen(
             val totalSales = grossSales ?: 0.0
             val expenses = totalExpenses ?: 0.0
             val profits = totalSales - expenses
-            val cashDrawer = startingFloat + totalSales
+            val cashDrawer = startingFloat + totalCash - expenses
 
             val zReadingInteractionSource = remember { MutableInteractionSource() }
             val zReadingPressed by zReadingInteractionSource.collectIsPressedAsState()
@@ -395,6 +403,44 @@ fun HistoryScreen(
                             onShare = { shareOrderReceipt(context, order) }
                         )
                     }
+                    
+                    if (orders.isNotEmpty()) {
+                        item {
+                            OutlinedButton(
+                                onClick = { viewModel.loadMoreOrders() },
+                                modifier = Modifier.fillMaxWidth().padding(vertical = 16.dp)
+                            ) {
+                                Text("Load More Orders")
+                            }
+                        }
+                    }
+                }
+            }
+
+            if (showDateRangeDialog) {
+                val dateRangePickerState = rememberDateRangePickerState()
+                DatePickerDialog(
+                    onDismissRequest = { showDateRangeDialog = false },
+                    confirmButton = {
+                        TextButton(onClick = {
+                            viewModel.setDateRange(
+                                start = dateRangePickerState.selectedStartDateMillis,
+                                end = dateRangePickerState.selectedEndDateMillis?.plus(86399999)
+                            )
+                            showDateRangeDialog = false
+                        }) { Text("Apply") }
+                    },
+                    dismissButton = {
+                        TextButton(onClick = { showDateRangeDialog = false }) { Text("Cancel") }
+                    }
+                ) {
+                    DateRangePicker(
+                        state = dateRangePickerState,
+                        title = { Text(text = "Select Date Range", modifier = Modifier.padding(16.dp)) },
+                        headline = { Text(text = "Filter Orders", modifier = Modifier.padding(horizontal = 16.dp)) },
+                        showModeToggle = false,
+                        modifier = Modifier.weight(1f)
+                    )
                 }
             }
 
@@ -566,10 +612,20 @@ fun OrderHistoryCard(
 }
 
 fun shareOrderReceipt(context: android.content.Context, order: com.example.cattasticpos.domain.model.Order) {
+    val itemsText = order.items.joinToString("\n") { item ->
+        "  ${item.quantity}x ${item.itemName}${if (item.variantName != null) " (${item.variantName})" else ""} - Php ${String.format("%.0f", item.unitPrice * item.quantity)}"
+    }
+    
     val text = """
         Brew ni Cat Receipt
         Order ID: ${order.id}
         Date: ${java.text.SimpleDateFormat("yyyy-MM-dd HH:mm:ss", java.util.Locale.getDefault()).format(java.util.Date(order.timestamp))}
+        
+        Items:
+$itemsText
+        
+        Subtotal: Php ${String.format("%.0f", order.subtotal)}
+        Discount: Php ${String.format("%.0f", order.discountDeduction)}
         Total: Php ${String.format("%.0f", order.total)}
         Payment: ${order.paymentMethod}
     """.trimIndent()

@@ -5,7 +5,7 @@ import com.example.cattasticpos.domain.model.Category
 import com.example.cattasticpos.domain.model.Item
 import com.example.cattasticpos.domain.strategy.DiscountStrategy
 import com.example.cattasticpos.domain.strategy.NoDiscountStrategy
-import com.example.cattasticpos.data.local.entity.InventoryEntity
+import com.example.cattasticpos.domain.model.InventoryItem
 
 data class DashboardUiState(
     val categories: List<Category> = emptyList(),
@@ -19,11 +19,12 @@ data class DashboardUiState(
     val total: Double = 0.0,
     val selectedConfiguringItem: Item? = null,
     val checkoutSuccessEvent: String? = null,
+    val snackbarMessage: String? = null,
     val heldQueues: Map<String, List<CartItem>> = emptyMap(),
     val showQueuesDialog: Boolean = false,
     val currentQueueId: String? = null,
     val showPaymentDialog: Boolean = false,
     val showExpenseDialog: Boolean = false,
     val showInventoryDialog: Boolean = false,
-    val inventory: List<InventoryEntity> = emptyList()
+    val inventory: List<InventoryItem> = emptyList()
 )

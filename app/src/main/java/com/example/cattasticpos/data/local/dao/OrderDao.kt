@@ -39,8 +39,8 @@ interface OrderDao {
     }
 
     @Transaction
-    @Query("SELECT * FROM orders ORDER BY timestamp DESC")
-    fun getOrdersWithItems(): Flow<List<OrderWithItems>>
+    @Query("SELECT * FROM orders WHERE timestamp >= :startDate AND timestamp <= :endDate ORDER BY timestamp DESC LIMIT :limit OFFSET :offset")
+    fun getOrdersWithItems(startDate: Long, endDate: Long, limit: Int, offset: Int): Flow<List<OrderWithItems>>
 
     @Query("SELECT itemName, SUM(quantity) as totalQuantity FROM order_items JOIN orders ON order_items.orderId = orders.id WHERE orders.timestamp >= :startOfDay AND orders.timestamp <= :endOfDay GROUP BY itemName ORDER BY totalQuantity DESC LIMIT 1")
     fun getTopSellingItemForDay(startOfDay: Long, endOfDay: Long): Flow<TopSellingItemResult?>

@@ -6,14 +6,19 @@ import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.CreationExtras
 import com.example.cattasticpos.CattasticPosApp
 import com.example.cattasticpos.data.local.dao.RecipeDao
-import com.example.cattasticpos.data.local.entity.InventoryEntity
+import com.example.cattasticpos.domain.model.InventoryItem
 import com.example.cattasticpos.data.local.entity.RecipeMappingEntity
 import com.example.cattasticpos.domain.repository.InventoryRepository
 import com.example.cattasticpos.domain.usecase.GetMenuUseCase
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.launch
 import java.util.UUID
 
@@ -37,6 +42,18 @@ class InventoryViewModel(
                 _uiState.update { it.copy(menuItems = menuResult.items) }
             }
         }
+        @OptIn(ExperimentalCoroutinesApi::class)
+        viewModelScope.launch {
+            _uiState.map { it.selectedMenuItemId }
+                .distinctUntilChanged()
+                .flatMapLatest { id ->
+                    if (id != null) recipeDao.getMappingsForMenu(id)
+                    else emptyFlow()
+                }
+                .collect { mappings ->
+                    _uiState.update { it.copy(currentRecipeMappings = mappings) }
+                }
+        }
     }
 
     fun restockItem(itemId: String, amount: Int) {
@@ -49,7 +66,7 @@ class InventoryViewModel(
 
     fun addNewRawMaterial(name: String, unit: String, startingStock: Int, threshold: Int) {
         viewModelScope.launch {
-            val newItem = InventoryEntity(
+            val newItem = InventoryItem(
                 id = "inv_${UUID.randomUUID()}",
                 itemName = name,
                 unit = unit,
@@ -63,20 +80,13 @@ class InventoryViewModel(
 
     fun selectMenuItem(menuItemId: String) {
         _uiState.update { it.copy(selectedMenuItemId = menuItemId, selectedVariantName = null) }
-        loadMappings(menuItemId)
     }
 
     fun selectVariant(variantName: String?) {
         _uiState.update { it.copy(selectedVariantName = variantName) }
     }
 
-    private fun loadMappings(menuItemId: String) {
-        viewModelScope.launch {
-            recipeDao.getMappingsForMenu(menuItemId).collect { mappings ->
-                _uiState.update { it.copy(currentRecipeMappings = mappings) }
-            }
-        }
-    }
+
 
     fun linkIngredient(inventoryItemId: String, deductionQuantity: Double) {
         val state = _uiState.value

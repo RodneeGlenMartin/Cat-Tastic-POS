@@ -9,6 +9,10 @@ import com.example.cattasticpos.domain.model.CartItem
 import com.example.cattasticpos.domain.model.Item
 import com.example.cattasticpos.domain.model.Variant
 import com.example.cattasticpos.domain.strategy.DiscountStrategy
+import com.example.cattasticpos.domain.strategy.NoDiscountStrategy
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 import com.example.cattasticpos.domain.usecase.CalculateCartUseCase
 import com.example.cattasticpos.domain.usecase.CheckoutUseCase
 import com.example.cattasticpos.domain.usecase.RestockItemUseCase
@@ -89,9 +93,11 @@ class DashboardViewModel(
         }
     }
 
-    fun addToCart(item: Item, variant: Variant, flavor: String?) {
+    fun addToCart(variant: Variant, flavor: String?) {
+        val currentItem = _uiState.value.selectedConfiguringItem ?: return
+        
         _uiState.update { state ->
-            val cartId = "${item.id}_${variant.id}_${flavor ?: ""}"
+            val cartId = "${currentItem.id}_${variant.id}_${flavor ?: ""}"
             val existingIndex = state.activeCart.indexOfFirst { it.id == cartId }
             
             val updatedCart = if (existingIndex != -1) {
@@ -105,7 +111,7 @@ class DashboardViewModel(
             } else {
                 state.activeCart + CartItem(
                     id = cartId,
-                    item = item,
+                    item = currentItem,
                     variant = variant,
                     flavor = flavor,
                     quantity = 1
@@ -119,9 +125,14 @@ class DashboardViewModel(
                 discountDeduction = calculation.discountDeduction,
                 discountLabel = calculation.discountLabel,
                 total = calculation.total,
-                selectedConfiguringItem = null
+                selectedConfiguringItem = null,
+                snackbarMessage = "${currentItem.name} added to cart!"
             )
         }
+    }
+
+    fun clearSnackbarMessage() {
+        _uiState.update { it.copy(snackbarMessage = null) }
     }
 
     fun changeQuantity(cartItemId: String, delta: Int) {
@@ -177,6 +188,7 @@ class DashboardViewModel(
                         state.copy(
                             activeCart = emptyList(),
                             currentQueueId = null,
+                            selectedDiscountStrategy = NoDiscountStrategy(),
                             subtotal = freshCalculation.subtotal,
                             discountDeduction = freshCalculation.discountDeduction,
                             discountLabel = freshCalculation.discountLabel,
@@ -201,7 +213,7 @@ class DashboardViewModel(
         _uiState.update { it.copy(checkoutSuccessEvent = null) }
     }
 
-    private var queueCounter = 0
+    // Removed int queueCounter
 
     fun holdCurrentOrder() {
         val currentCart = _uiState.value.activeCart
@@ -209,8 +221,8 @@ class DashboardViewModel(
         
         _uiState.update { state ->
             val queueId = state.currentQueueId ?: run {
-                queueCounter++
-                "Queue #$queueCounter"
+                val timeString = SimpleDateFormat("h:mm a", Locale.getDefault()).format(Date())
+                "Queue $timeString"
             }
             val updatedQueues = state.heldQueues + (queueId to currentCart)
             val freshCalculation = calculateCartUseCase(emptyList(), state.selectedDiscountStrategy)

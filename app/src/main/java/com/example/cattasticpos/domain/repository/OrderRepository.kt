@@ -4,7 +4,7 @@ import com.example.cattasticpos.domain.model.Order
 import kotlinx.coroutines.flow.Flow
 
 interface OrderRepository {
-    fun getOrdersWithItems(): Flow<List<Order>>
+    fun getOrdersWithItems(startDate: Long = 0, endDate: Long = Long.MAX_VALUE, limit: Int = 50, offset: Int = 0): Flow<List<Order>>
     suspend fun saveOrder(order: Order)
     fun getTopSellingItemForDay(startOfDay: Long, endOfDay: Long): Flow<Pair<String, Int>?>
     fun getGrossSalesForDay(startOfDay: Long, endOfDay: Long): Flow<Double?>

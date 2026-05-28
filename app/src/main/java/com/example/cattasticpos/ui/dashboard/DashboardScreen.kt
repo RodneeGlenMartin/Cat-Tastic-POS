@@ -64,6 +64,13 @@ fun DashboardScreen(
         }
     }
 
+    LaunchedEffect(uiState.snackbarMessage) {
+        uiState.snackbarMessage?.let { message ->
+            snackbarHostState.showSnackbar(message)
+            viewModel.clearSnackbarMessage()
+        }
+    }
+
     Scaffold(
         topBar = {
             TopAppBar(
@@ -269,7 +276,7 @@ fun DashboardScreen(
             ProductConfigBottomSheet(
                 item = uiState.selectedConfiguringItem!!,
                 onDismiss = { viewModel.hideConfigurationSheet() },
-                onAddToCart = { variant, flavor -> viewModel.addToCart(uiState.selectedConfiguringItem!!, variant, flavor) }
+                onAddToCart = { variant, flavor -> viewModel.addToCart(variant, flavor) }
             )
         }
         if (uiState.showQueuesDialog) {
@@ -478,7 +485,9 @@ fun ProductConfigBottomSheet(item: Item, onDismiss: () -> Unit, onAddToCart: (Va
                 Spacer(modifier = Modifier.height(8.dp))
                 FlowRow(horizontalArrangement = Arrangement.spacedBy(6.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
                     item.variants.forEach { variant ->
-                        FilterChip(selected = selectedVariant.id == variant.id, onClick = { selectedVariant = variant }, label = { Text("${variant.name} (+₱${String.format("%.0f", variant.getPrice(selectedFlavor))})") }, colors = FilterChipDefaults.filterChipColors(selectedContainerColor = MaterialTheme.colorScheme.secondary, selectedLabelColor = MaterialTheme.colorScheme.onSecondary), shape = RoundedCornerShape(8.dp))
+                        val priceToAdd = variant.getPrice(selectedFlavor)
+                        val priceString = if (priceToAdd > 0) " (+₱${String.format("%.0f", priceToAdd)})" else ""
+                        FilterChip(selected = selectedVariant.id == variant.id, onClick = { selectedVariant = variant }, label = { Text("${variant.name}$priceString") }, colors = FilterChipDefaults.filterChipColors(selectedContainerColor = MaterialTheme.colorScheme.secondary, selectedLabelColor = MaterialTheme.colorScheme.onSecondary), shape = RoundedCornerShape(8.dp))
                     }
                 }
                 Spacer(modifier = Modifier.height(12.dp))
