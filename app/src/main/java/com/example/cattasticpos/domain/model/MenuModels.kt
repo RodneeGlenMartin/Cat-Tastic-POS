@@ -22,6 +22,9 @@ data class Variant(
             val cleanPrice = priceByFlavor[cleanFlavor]
             if (cleanPrice != null) return cleanPrice
         }
+        if (basePrice == 0.0 && priceByFlavor.isNotEmpty()) {
+            throw IllegalStateException("Invalid flavor selected or flavor price missing for zero-base item.")
+        }
         return basePrice
     }
 }

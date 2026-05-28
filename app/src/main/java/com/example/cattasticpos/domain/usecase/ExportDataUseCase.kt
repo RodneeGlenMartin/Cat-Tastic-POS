@@ -36,19 +36,28 @@ class ExportDataUseCase(private val context: Context) {
                 }
             }
 
-            val resolver = context.contentResolver
-            val contentValues = ContentValues().apply {
-                put(MediaStore.MediaColumns.DISPLAY_NAME, filename)
-                put(MediaStore.MediaColumns.MIME_TYPE, "text/csv")
-                put(MediaStore.MediaColumns.RELATIVE_PATH, Environment.DIRECTORY_DOWNLOADS)
+            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.Q) {
+                val resolver = context.contentResolver
+                val contentValues = ContentValues().apply {
+                    put(MediaStore.MediaColumns.DISPLAY_NAME, filename)
+                    put(MediaStore.MediaColumns.MIME_TYPE, "text/csv")
+                    put(MediaStore.MediaColumns.RELATIVE_PATH, Environment.DIRECTORY_DOWNLOADS)
+                }
+
+                val uri = resolver.insert(MediaStore.Downloads.EXTERNAL_CONTENT_URI, contentValues)
+                    ?: return@withContext Result.failure(Exception("Failed to create MediaStore entry"))
+
+                resolver.openOutputStream(uri)?.use { outputStream ->
+                    outputStream.write(csvContent.toByteArray())
+                } ?: return@withContext Result.failure(Exception("Failed to open output stream"))
+            } else {
+                val downloadsDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS)
+                if (!downloadsDir.exists()) {
+                    downloadsDir.mkdirs()
+                }
+                val file = java.io.File(downloadsDir, filename)
+                file.writeText(csvContent)
             }
-
-            val uri = resolver.insert(MediaStore.Downloads.EXTERNAL_CONTENT_URI, contentValues)
-                ?: return@withContext Result.failure(Exception("Failed to create MediaStore entry"))
-
-            resolver.openOutputStream(uri)?.use { outputStream ->
-                outputStream.write(csvContent.toByteArray())
-            } ?: return@withContext Result.failure(Exception("Failed to open output stream"))
 
             Result.success(filename)
         } catch (e: Exception) {

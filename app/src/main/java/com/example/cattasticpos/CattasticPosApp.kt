@@ -14,6 +14,8 @@ import com.example.cattasticpos.domain.repository.RecipeRepository
 import com.example.cattasticpos.data.repository.RecipeRepositoryImpl
 import com.example.cattasticpos.domain.repository.AppConfigRepository
 import com.example.cattasticpos.data.repository.AppConfigRepositoryImpl
+import com.example.cattasticpos.domain.repository.TransactionProvider
+import com.example.cattasticpos.data.local.RoomTransactionProvider
 import com.example.cattasticpos.domain.usecase.CalculateCartUseCase
 import com.example.cattasticpos.domain.usecase.CheckoutUseCase
 import com.example.cattasticpos.domain.usecase.RestockItemUseCase
@@ -50,6 +52,7 @@ interface AppContainer {
     val appConfigRepository: AppConfigRepository
     val restockItemUseCase: RestockItemUseCase
     val receiptPrinterService: ReceiptPrinterService
+    val transactionProvider: TransactionProvider
 }
 
 class AppContainerImpl(
@@ -78,7 +81,7 @@ class AppContainerImpl(
     }
 
     override val checkoutUseCase: CheckoutUseCase by lazy {
-        CheckoutUseCase(orderRepository, inventoryRepository, recipeRepository, calculateCartUseCase)
+        CheckoutUseCase(orderRepository, inventoryRepository, recipeRepository, transactionProvider, calculateCartUseCase)
     }
 
     override val expenseRepository: ExpenseRepository by lazy {
@@ -107,5 +110,9 @@ class AppContainerImpl(
 
     override val receiptPrinterService: ReceiptPrinterService by lazy {
         ReceiptPrinterService(context)
+    }
+
+    override val transactionProvider: TransactionProvider by lazy {
+        RoomTransactionProvider(database)
     }
 }

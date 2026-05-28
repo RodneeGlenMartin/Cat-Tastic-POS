@@ -710,7 +710,7 @@ fun EditConfigDialog(
         confirmButton = {
             TextButton(
                 onClick = {
-                    if (AppConfig.hashPin(currentPin) == expectedPinHash) {
+                    if (AppConfig.verifyPin(currentPin, expectedPinHash)) {
                         val t = targetStr.toDoubleOrNull() ?: initialTarget
                         val f = floatStr.toDoubleOrNull() ?: initialFloat
                         val finalPinHash = if (newPin.length == 4) AppConfig.hashPin(newPin) else expectedPinHash

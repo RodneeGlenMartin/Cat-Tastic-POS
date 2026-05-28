@@ -66,7 +66,7 @@ abstract class PosDatabase : RoomDatabase() {
 
         val MIGRATION_9_10 = object : androidx.room.migration.Migration(9, 10) {
             override fun migrate(db: SupportSQLiteDatabase) {
-                db.execSQL("ALTER TABLE app_config ADD COLUMN pinHash TEXT NOT NULL DEFAULT '03ac674216f3e15c761ee1a5e255f067953623c8b388b4459e13f978d7c846f4'")
+                db.execSQL("ALTER TABLE app_config ADD COLUMN pinHash TEXT NOT NULL DEFAULT 'otCBSIxSZkk6vcF7SKwqCw==:Seyex1KVzCA7gLC3+1Vi8AHYtjU7A168GCGRihADbp0='")
                 db.execSQL("CREATE TABLE inventory_new (id TEXT NOT NULL PRIMARY KEY, itemName TEXT NOT NULL, unit TEXT NOT NULL, currentStock REAL NOT NULL, reorderThreshold REAL NOT NULL)")
                 db.execSQL("INSERT INTO inventory_new (id, itemName, unit, currentStock, reorderThreshold) SELECT id, itemName, unit, CAST(currentStock AS REAL), CAST(reorderThreshold AS REAL) FROM inventory")
                 db.execSQL("DROP TABLE inventory")
@@ -88,7 +88,7 @@ abstract class PosDatabase : RoomDatabase() {
         }
 
         private suspend fun prepopulateDatabase(menuDao: MenuDao, inventoryDao: InventoryDao, recipeDao: RecipeDao, appConfigDao: AppConfigDao) {
-            appConfigDao.insertConfig(AppConfigEntity(id = 1, targetSales = 5000.0, startingCashFloat = 500.0, pinHash = "03ac674216f3e15c761ee1a5e255f067953623c8b388b4459e13f978d7c846f4"))
+            appConfigDao.insertConfig(AppConfigEntity(id = 1, targetSales = 5000.0, startingCashFloat = 500.0, pinHash = "otCBSIxSZkk6vcF7SKwqCw==:Seyex1KVzCA7gLC3+1Vi8AHYtjU7A168GCGRihADbp0="))
             
             val categories = listOf(
                 CategoryEntity("cat_bites", "Cat-Tastic Bites"),

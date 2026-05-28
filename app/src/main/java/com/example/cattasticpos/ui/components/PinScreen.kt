@@ -72,7 +72,7 @@ fun PinScreen(
             Spacer(modifier = Modifier.height(32.dp))
             Button(
                 onClick = {
-                    if (AppConfig.hashPin(pin) == expectedPinHash) {
+                    if (AppConfig.verifyPin(pin, expectedPinHash)) {
                         onPinSuccess()
                     } else {
                         isError = true
